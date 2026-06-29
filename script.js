@@ -86,7 +86,8 @@ function initPredictor(riskForm) {
   const factorList = document.querySelector("#factorList");
   const recommendation = document.querySelector("#recommendation");
   const apiStatus = document.querySelector("#apiStatus");
-  const apiBase = (window.M6_API_BASE_URL || "http://127.0.0.1:8010").replace(/\/$/, "");
+  const apiBase = (window.M6_API_BASE_URL || "https://tandies-biofusion-api.hf.space").replace(/\/$/, "");
+  let backendModel = "BioFusion-22feat";
   let requestId = 0;
   const presets = {
     low: {
@@ -126,12 +127,30 @@ function initPredictor(riskForm) {
       mets: ["liver"],
     },
   };
+  const incomeOrder = {
+    Missing: 0,
+    "<60k": 1,
+    "60-79k": 2,
+    "80-99k": 3,
+    "100-119k": 4,
+    "120k+": 5,
+  };
+  const riskLevelLabels = {
+    low: "Low risk",
+    medium: "Medium risk",
+    high: "High risk",
+  };
+  const riskMessages = {
+    low: "BioFusion returned a low-risk probability below 5%. This display is for the course demo only and is not clinical guidance.",
+    medium: "BioFusion returned a medium-risk probability between 5% and 15%. Review the submitted diagnosis-time profile in context.",
+    high: "BioFusion returned a high-risk probability of at least 15%. Treat this as a demo risk flag, not a clinical decision.",
+  };
 
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
   }
 
-  function getFormData() {
+  function getUiFormData() {
     const data = new FormData(riskForm);
     return {
       age: Number(data.get("age")),
@@ -144,6 +163,58 @@ function initPredictor(riskForm) {
       period: data.get("period"),
       nodesPositive: Number(data.get("nodesPositive") || 0),
       mets: data.getAll("mets"),
+    };
+  }
+
+  function mapSubtype(value) {
+    if (value === "HR-/HER2-") return "TN";
+    if (value === "Unknown") return "unknown";
+    return value;
+  }
+
+  function mapGrade(value) {
+    return value === "Unknown" ? "unknown" : value;
+  }
+
+  function deriveTRecode(tumorSizeMm) {
+    if (!Number.isFinite(tumorSizeMm) || tumorSizeMm <= 0) return "unknown";
+    if (tumorSizeMm <= 20) return "T1";
+    if (tumorSizeMm <= 50) return "T2";
+    return "T3";
+  }
+
+  function deriveNRecode(nodesPositive) {
+    if (!Number.isFinite(nodesPositive)) return "unknown";
+    if (nodesPositive <= 0) return "N0";
+    if (nodesPositive <= 3) return "N1";
+    if (nodesPositive <= 9) return "N2";
+    return "N3";
+  }
+
+  function buildBioFusionPayload() {
+    const data = getUiFormData();
+    const mets = new Set(data.mets);
+    const hasDistantMets = data.stage === "4" || mets.size > 0;
+    return {
+      age_years: data.age,
+      breast_subtype: mapSubtype(data.subtype),
+      tumor_size_log: Number(Math.log1p(data.tumorSize).toFixed(4)),
+      eod_2018_stage_group: data.stage,
+      t_recode: deriveTRecode(data.tumorSize),
+      n_recode: deriveNRecode(data.nodesPositive),
+      m_recode: hasDistantMets ? "M1" : "M0",
+      grade_path: mapGrade(data.grade),
+      histology_group: "other",
+      race: data.race === "Unknown" ? "unknown" : data.race,
+      marital_status: "other",
+      nodes_positive: data.nodesPositive,
+      bone_mets: mets.has("bone") ? 1 : 0,
+      brain_mets: mets.has("brain") ? 1 : 0,
+      liver_mets: mets.has("liver") ? 1 : 0,
+      lung_mets: mets.has("lung") ? 1 : 0,
+      metro: 0,
+      income_ord: incomeOrder[data.income] ?? 0,
+      covid_period: data.period === "covid" ? 1 : 0,
     };
   }
 
@@ -182,23 +253,56 @@ function initPredictor(riskForm) {
     apiStatus.dataset.kind = kind;
   }
 
-  function renderPrediction(result) {
-    riskScore.textContent = result.riskPercent;
-    riskTier.textContent = result.tier;
-    riskFill.style.width = `${clamp(Number(result.risk) * 100, 2, 100)}%`;
-    recommendation.textContent = result.recommendation;
+  function formatPercent(probability) {
+    const percentage = clamp(Number(probability) * 100, 0, 100);
+    return `${percentage.toFixed(percentage < 1 ? 2 : 1)}%`;
+  }
+
+  function renderPayloadSummary(payload) {
+    const metastaticSites = [
+      ["Bone", payload.bone_mets],
+      ["Brain", payload.brain_mets],
+      ["Liver", payload.liver_mets],
+      ["Lung", payload.lung_mets],
+    ]
+      .filter(([, value]) => value === 1)
+      .map(([label]) => label);
+    const rows = [
+      ["Age", `${payload.age_years} years`],
+      ["Subtype", payload.breast_subtype],
+      ["Stage", payload.eod_2018_stage_group],
+      ["Tumor log", payload.tumor_size_log.toFixed(2)],
+      ["T/N/M", `${payload.t_recode} / ${payload.n_recode} / ${payload.m_recode}`],
+      ["Metastases", metastaticSites.length ? metastaticSites.join(", ") : "None selected"],
+    ];
+
     factorList.innerHTML = "";
-    result.topFactors.forEach((item) => {
+    rows.forEach(([label, value]) => {
       const li = document.createElement("li");
-      const value = Number(item.value);
-      li.innerHTML = `<span>${item.label}</span><strong>${value >= 0 ? "+" : ""}${value.toFixed(2)}</strong>`;
+      const labelSpan = document.createElement("span");
+      const valueStrong = document.createElement("strong");
+      labelSpan.textContent = label;
+      valueStrong.textContent = value;
+      li.append(labelSpan, valueStrong);
       factorList.append(li);
     });
   }
 
+  function renderPrediction(result) {
+    const probability = Number(result.probability);
+    const riskLevel = String(result.risk_level || "").toLowerCase();
+    if (!Number.isFinite(probability) || !riskLevelLabels[riskLevel]) {
+      throw new Error("Unexpected BioFusion response format");
+    }
+    riskScore.textContent = formatPercent(probability);
+    riskTier.textContent = riskLevelLabels[riskLevel];
+    riskFill.style.width = `${clamp(probability * 100, 2, 100)}%`;
+    recommendation.textContent = riskMessages[riskLevel];
+  }
+
   function markPending() {
     syncLabels();
-    setStatus("Backend API: ready. Click Calculate Risk Tier to run prediction.", "pending");
+    setStatus("Backend API: ready. Click Calculate Risk Tier to call BioFusion.", "pending");
   }
 
   function renderInitialState() {
@@ -206,34 +310,51 @@ function initPredictor(riskForm) {
     riskTier.textContent = "Ready to calculate";
     riskScore.textContent = "--";
     riskFill.style.width = "2%";
-    factorList.innerHTML = "<li><span>Enter parameters, then click Calculate Risk Tier.</span><strong>↵</strong></li>";
-    recommendation.textContent = "The backend model will run only after you submit the completed profile.";
-    setStatus("Backend API: ready. Click Calculate Risk Tier to run prediction.", "pending");
+    factorList.innerHTML = "<li><span>Enter parameters, then click Calculate Risk Tier.</span><strong>--</strong></li>";
+    recommendation.textContent = "The BioFusion model will run only after you submit the profile.";
+    setStatus("Backend API: checking BioFusion service...", "pending");
+  }
+
+  async function checkHealth() {
+    const current = ++requestId;
+    try {
+      const response = await fetch(`${apiBase}/health`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const health = await response.json();
+      if (current !== requestId) return;
+      backendModel = health.model || backendModel;
+      setStatus(`Backend API: ready (${backendModel})`, "ok");
+    } catch (error) {
+      if (current !== requestId) return;
+      setStatus(`Backend API: health check unavailable at ${apiBase}`, "error");
+    }
   }
 
   async function requestPrediction() {
     syncLabels();
+    const payload = buildBioFusionPayload();
     const current = ++requestId;
-    setStatus("Backend API: requesting prediction...", "pending");
+    setStatus("Backend API: requesting BioFusion prediction...", "pending");
     try {
-      const response = await fetch(`${apiBase}/api/predict`, {
+      const response = await fetch(`${apiBase}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(getFormData()),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
       if (current !== requestId) return;
       renderPrediction(result);
-      setStatus(`Backend API: connected (${result.model})`, "ok");
+      renderPayloadSummary(payload);
+      setStatus(`Backend API: prediction returned by ${backendModel}`, "ok");
     } catch (error) {
       if (current !== requestId) return;
       setStatus(`Backend API: unavailable at ${apiBase}`, "error");
       riskTier.textContent = "API offline";
       riskScore.textContent = "--";
       riskFill.style.width = "2%";
-      factorList.innerHTML = "<li><span>Start the backend API or update config.js.</span><strong>!</strong></li>";
-      recommendation.textContent = "Run `python3 api/server.py` locally, or deploy the FastAPI backend and set window.M6_API_BASE_URL in config.js.";
+      factorList.innerHTML = "<li><span>Check the configured BioFusion API base URL.</span><strong>!</strong></li>";
+      recommendation.textContent = "The page is configured to POST JSON to /predict and read probability plus risk_level from the response.";
     }
   }
 
@@ -246,4 +367,5 @@ function initPredictor(riskForm) {
     button.addEventListener("click", () => applyPreset(button.dataset.preset));
   });
   renderInitialState();
+  checkHealth();
 }

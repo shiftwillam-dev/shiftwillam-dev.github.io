@@ -1,143 +1,124 @@
-# M6 Demo API Usage
+# BioFusion API Usage
 
-This website calls a backend model API only when the user clicks **Calculate Risk Tier** on `m6.html`.
+This website calls the BioFusion model API when the user clicks **Calculate Risk Tier** on `m6.html`.
 
-## API Endpoint
-
-Local backend:
+## Base URL
 
 ```text
-POST http://127.0.0.1:8010/api/predict
+https://tandies-biofusion-api.hf.space
 ```
 
 Frontend configuration file:
 
 ```text
-website/config.js
+config.js
 ```
-
-For local demo:
 
 ```js
-window.M6_API_BASE_URL = "http://127.0.0.1:8010";
+window.M6_API_BASE_URL = "https://tandies-biofusion-api.hf.space";
 ```
-
-For GitHub Pages deployment, replace it with the deployed backend URL:
-
-```js
-window.M6_API_BASE_URL = "https://YOUR-API-DOMAIN";
-```
-
-The frontend will call:
-
-```text
-https://YOUR-API-DOMAIN/api/predict
-```
-
-## Request Body
-
-Send JSON with the following fields:
-
-```json
-{
-  "age": 64,
-  "tumorSize": 22,
-  "stage": "2A",
-  "subtype": "HR+/HER2-",
-  "grade": "G2",
-  "race": "White",
-  "income": "120k+",
-  "period": "recent",
-  "nodesPositive": 0,
-  "mets": []
-}
-```
-
-## Parameters
-
-| Field | Type | Allowed values / format | Meaning |
-|---|---:|---|---|
-| `age` | number | 18-90 | Age at diagnosis |
-| `tumorSize` | number | 1-150 | Tumor size in millimeters |
-| `stage` | string | `1A`, `1B`, `2A`, `2B`, `3A`, `3B`, `3C`, `4` | EOD/AJCC-style stage group |
-| `subtype` | string | `HR+/HER2-`, `HR+/HER2+`, `HR-/HER2+`, `HR-/HER2-`, `Unknown` | Breast molecular subtype |
-| `grade` | string | `G1`, `G2`, `G3`, `G4`, `Unknown` | Pathological grade |
-| `race` | string | `White`, `Black`, `Asian or Pacific Islander`, `American Indian/Alaska Native`, `Unknown` | Race subgroup for demo fairness context |
-| `income` | string | `120k+`, `100-119k`, `80-99k`, `60-79k`, `<60k`, `Missing` | Neighborhood income context |
-| `period` | string | `pre`, `covid`, `recent` | Diagnosis period: 2018-2019, 2020-2021, or 2022-2023 |
-| `nodesPositive` | number | 0-40 | Number of positive lymph nodes |
-| `mets` | array of strings | Any of `bone`, `brain`, `liver`, `lung` | Metastatic sites at diagnosis |
-
-## Example Request
-
-```bash
-curl -X POST http://127.0.0.1:8010/api/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "age": 82,
-    "tumorSize": 74,
-    "stage": "4",
-    "subtype": "HR-/HER2-",
-    "grade": "G3",
-    "race": "Black",
-    "income": "<60k",
-    "period": "pre",
-    "nodesPositive": 8,
-    "mets": ["liver"]
-  }'
-```
-
-## Response Body
-
-The API returns JSON:
-
-```json
-{
-  "risk": 0.72,
-  "riskPercent": "72.0%",
-  "tier": "High risk",
-  "recommendation": "High-priority follow-up: discuss intensified review, treatment planning, and resource prioritization.",
-  "topFactors": [
-    { "label": "Stage 4", "value": 2.55 },
-    { "label": "liver metastasis", "value": 0.76 }
-  ],
-  "model": "backend-demo-estimator-v1",
-  "disclaimer": "Course demo only. Not for clinical decision-making."
-}
-```
-
-## Response Fields
-
-| Field | Meaning |
-|---|---|
-| `risk` | Numeric risk probability between 0 and 1 |
-| `riskPercent` | Human-readable percent shown in the M6 page |
-| `tier` | `Low risk`, `Moderate risk`, or `High risk` |
-| `recommendation` | Stakeholder-facing interpretation text |
-| `topFactors` | Highest-impact feature drivers used for the explanation panel |
-| `model` | Backend model identifier |
-| `disclaimer` | Safety note for demo use |
 
 ## Health Check
 
 ```text
-GET /api/health
+GET /health
 ```
 
 Expected response:
 
 ```json
+{ "status": "ok", "model": "BioFusion-22feat" }
+```
+
+## Single Prediction
+
+```text
+POST /predict
+```
+
+The frontend sends the documented BioFusion request fields. Fields not collected by the page are omitted or filled with documented defaults.
+
+Example payload generated from the M6 form:
+
+```json
 {
-  "ok": true,
-  "service": "m6-risk-api"
+  "age_years": 55,
+  "breast_subtype": "HR+/HER2-",
+  "tumor_size_log": 2.5,
+  "eod_2018_stage_group": "2A",
+  "t_recode": "T2",
+  "n_recode": "N0",
+  "m_recode": "M0",
+  "grade_path": "G2",
+  "histology_group": "other",
+  "race": "White",
+  "marital_status": "other",
+  "nodes_positive": 0,
+  "bone_mets": 0,
+  "brain_mets": 0,
+  "liver_mets": 0,
+  "lung_mets": 0,
+  "metro": 0,
+  "income_ord": 5,
+  "covid_period": 0
 }
 ```
 
-## Important Note
+Response:
 
-GitHub Pages can only host the static frontend. It cannot run the Python backend. For a public demo URL, deploy:
+```json
+{
+  "probability": 0.0536,
+  "risk_level": "medium"
+}
+```
 
-1. `website/` to GitHub Pages.
-2. `api/` to a backend host such as Render, Railway, Fly.io, or another Python server.
+Response fields:
 
-Then update `website/config.js` to point to the deployed backend.
+| Field | Meaning |
+|---|---|
+| `probability` | Risk probability from 0 to 1 |
+| `risk_level` | `low` for < 5%, `medium` for 5-15%, or `high` for >= 15% |
+
+## Batch Prediction
+
+```text
+POST /predict/batch
+```
+
+Request body is an array of prediction payloads:
+
+```json
+[
+  { "age_years": 55, "breast_subtype": "HR+/HER2-", "tumor_size_log": 2.5 },
+  { "age_years": 70, "breast_subtype": "TN", "bone_mets": 1 }
+]
+```
+
+Response:
+
+```json
+[
+  { "probability": 0.0536, "risk_level": "medium" },
+  { "probability": 0.182, "risk_level": "high" }
+]
+```
+
+## Frontend Mapping Notes
+
+The M6 page keeps the user-facing form compact, then maps it into BioFusion fields in `script.js`:
+
+| Form field | BioFusion field |
+|---|---|
+| `age` | `age_years` |
+| `subtype` | `breast_subtype`; `HR-/HER2-` maps to `TN` |
+| `tumorSize` | `tumor_size_log` using `Math.log1p(mm)` |
+| `stage` | `eod_2018_stage_group`; also helps derive `m_recode` |
+| `grade` | `grade_path` |
+| `race` | `race` |
+| `income` | `income_ord` |
+| `period` | `covid_period` |
+| `nodesPositive` | `nodes_positive` and derived `n_recode` |
+| `mets` | `bone_mets`, `brain_mets`, `liver_mets`, `lung_mets` |
+
+The current BioFusion API response does not include feature-driver explanations, so the result panel displays the submitted API-field summary instead of old `topFactors` data.

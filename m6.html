@@ -23,8 +23,8 @@
         <p class="milestone-label">M6 · Working Demo / Deployment</p>
         <h1>Live risk stratification from diagnosis-time features</h1>
         <p>
-          This page is the interactive deployment artifact. It simulates the BioFusion workflow
-          by taking a patient profile, returning a calibrated risk-style score, and explaining the top drivers.
+          This page is the interactive deployment artifact. It sends a patient profile to the
+          BioFusion API and displays the returned survival-risk probability and risk tier.
         </p>
       </section>
       <section class="section-band demo-section">
@@ -72,9 +72,9 @@
           </form>
           <aside class="result-panel" aria-live="polite">
             <div class="api-status" id="apiStatus">Backend API: checking...</div>
-            <div class="result-top"><span id="riskTier">Moderate risk</span><strong id="riskScore">12.8%</strong></div>
+            <div class="result-top"><span id="riskTier">Ready to calculate</span><strong id="riskScore">--</strong></div>
             <div class="risk-meter" aria-hidden="true"><span id="riskFill"></span></div>
-            <div class="result-detail"><h3>Model-style explanation</h3><ul id="factorList"></ul></div>
+            <div class="result-detail"><h3>Submitted BioFusion fields</h3><ul id="factorList"></ul></div>
             <div class="recommendation" id="recommendation"></div>
             <p class="demo-note">
               This is a course demo estimator based on project findings. It is not a medical device,
@@ -86,8 +86,8 @@
       <section class="section-band">
         <div class="detail-grid">
           <article class="detail-card"><span>1</span><h3>Input</h3><p>The user enters diagnosis-time variables: age, stage, subtype, grade, race, tumor size, nodes, income context, time period, and metastasis sites.</p></article>
-          <article class="detail-card"><span>2</span><h3>Risk score</h3><p>The demo estimator converts the profile into a calibrated risk-style probability and assigns low, moderate, or high risk.</p></article>
-          <article class="detail-card"><span>3</span><h3>Explanation</h3><p>The output lists top feature drivers, mirroring the stakeholder-facing explainability goal of the full project.</p></article>
+          <article class="detail-card"><span>2</span><h3>Risk score</h3><p>The BioFusion API returns a probability and assigns low, medium, or high risk using documented thresholds.</p></article>
+          <article class="detail-card"><span>3</span><h3>Request summary</h3><p>The result panel lists the mapped API fields sent to the backend so the request can be inspected.</p></article>
         </div>
       </section>
       <section class="section-band">
@@ -98,10 +98,10 @@
         <div class="flow-board six">
           <div class="flow-step"><strong>Frontend</strong><span>GitHub Pages hosts the static M1-M6 website.</span></div>
           <div class="flow-step"><strong>Form input</strong><span>The M6 page collects diagnosis-time features from the user.</span></div>
-          <div class="flow-step"><strong>API call</strong><span>The browser sends JSON to `/api/predict` on the backend service.</span></div>
-          <div class="flow-step"><strong>Model layer</strong><span>The backend computes risk and feature drivers.</span></div>
-          <div class="flow-step"><strong>JSON response</strong><span>The API returns risk, tier, recommendation, and top factors.</span></div>
-          <div class="flow-step"><strong>Display</strong><span>The page updates the risk meter, explanation, and status badge.</span></div>
+          <div class="flow-step"><strong>API call</strong><span>The browser sends BioFusion JSON to `/predict` on the backend service.</span></div>
+          <div class="flow-step"><strong>Model layer</strong><span>The backend computes the survival-risk probability.</span></div>
+          <div class="flow-step"><strong>JSON response</strong><span>The API returns `probability` and `risk_level`.</span></div>
+          <div class="flow-step"><strong>Display</strong><span>The page updates the risk meter, request summary, and status badge.</span></div>
         </div>
       </section>
       <section class="section-band nav-pager">
