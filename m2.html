@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M2 Data Acquisition | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m2">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M2 · Data Acquisition</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a><a class="active" href="m2.html">M2</a><a href="m3.html">M3</a>
+        <a href="m4.html">M4</a><a href="m5.html">M5</a><a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M2 · Data Acquisition</p>
+        <h1>Use a real cancer registry, not a toy dataset</h1>
+        <p>
+          The project uses SEER Research Plus breast cancer records from 2018-2023,
+          exported through SEER*Stat and preserved as immutable raw CSV files.
+        </p>
+      </section>
+      <section class="section-band">
+        <div class="data-grid">
+          <article><span class="data-number">423,489</span><h3>Raw records</h3><p>Breast cancer diagnoses, ICD-O-3 C50, from SEER 17 registries.</p></article>
+          <article><span class="data-number">243</span><h3>Full export variables</h3><p>Includes clinical, demographic, staging, biomarker, treatment, and outcome fields.</p></article>
+          <article><span class="data-number">102</span><h3>Common-variable subset</h3><p>Clinical relevance and missingness filtering reduce noise before preprocessing.</p></article>
+        </div>
+      </section>
+      <section class="section-band two-col reverse">
+        <figure class="figure-panel">
+          <img src="assets/framework.png" alt="Data science framework diagram" />
+          <figcaption>Data acquisition is the foundation for the full lifecycle from M2 through M6.</figcaption>
+        </figure>
+        <div class="section-copy">
+          <h2>Why SEER is appropriate</h2>
+          <p>
+            SEER provides population-level cancer registry data with standardized staging,
+            receptor status, survival follow-up, and demographic variables. The 2018+ window
+            aligns with EOD 2018 staging and modern molecular marker availability.
+          </p>
+          <ul class="check-list">
+            <li>Government-maintained registry with strong provenance.</li>
+            <li>Large enough for temporal validation and subgroup analysis.</li>
+            <li>Includes key predictors: stage, subtype, grade, age, race, income context.</li>
+          </ul>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Acquisition workflow</p>
+          <h2>How raw SEER data becomes a project-ready source</h2>
+        </div>
+        <div class="flow-board">
+          <div class="flow-step"><strong>Access</strong><span>Register for SEER Research Plus data and follow the data-use agreement.</span></div>
+          <div class="flow-step"><strong>Filter</strong><span>Select breast cancer diagnoses using ICD-O-3 site C50 and years 2018-2023.</span></div>
+          <div class="flow-step"><strong>Export</strong><span>Use SEER*Stat to export full-variable and common-variable CSV files.</span></div>
+          <div class="flow-step"><strong>Preserve</strong><span>Keep raw CSV files immutable and record file checksums.</span></div>
+          <div class="flow-step"><strong>Document</strong><span>Record provenance, cohort scope, feature scope, and access limitations.</span></div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="tab-shell" data-tab-group>
+          <div class="tab-buttons">
+            <button class="active" data-tab="retained" type="button">Retained Variables</button>
+            <button data-tab="dropped" type="button">Dropped Variables</button>
+            <button data-tab="risks" type="button">Data Risks</button>
+          </div>
+          <div class="tab-panel active" data-tab-panel="retained">
+            <h3>Clinically relevant predictors</h3>
+            <p>The retained set includes age, sex, race, marital status, income, rural-urban code, tumor size, histology, grade, EOD stage, T/N/M recodes, ER/PR/HER2 status, breast subtype, lymph node variables, metastatic site indicators, and outcome audit fields.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="dropped">
+            <h3>Variables removed before analysis</h3>
+            <p>Legacy staging fields, non-breast site-specific factors, fully blank retired schemas, and redundant age recodes are removed to reduce noise and multicollinearity.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="risks">
+            <h3>Bias and risk assessment</h3>
+            <p>The project documents selection bias, information bias, confounding by race and income, missingness codes, multiple primaries, class imbalance, and temporal distribution shift.</p>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Variable map</p>
+          <h2>How the acquired data supports the prediction task</h2>
+        </div>
+        <table class="mini-table">
+          <thead><tr><th>Variable group</th><th>Examples</th><th>Role in the demo story</th></tr></thead>
+          <tbody>
+            <tr><td>Demographics</td><td>Age, race, marital status, income context, rural-urban code</td><td>Support subgroup analysis and social-context risk signals.</td></tr>
+            <tr><td>Tumor biology</td><td>Tumor size, grade, histology, laterality</td><td>Represent disease severity at diagnosis.</td></tr>
+            <tr><td>Staging</td><td>EOD stage group, T/N/M recodes, metastatic site indicators</td><td>Provide the strongest clinical structure for prognosis.</td></tr>
+            <tr><td>Biomarkers</td><td>ER, PR, HER2, molecular subtype</td><td>Capture breast cancer subtype differences, including triple-negative risk.</td></tr>
+            <tr><td>Outcome audit fields</td><td>Vital status, survival time, cause-specific death classification</td><td>Used to construct and audit the label, not as ordinary predictors.</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Data risk controls</p>
+          <h2>Bias and feasibility are handled before modelling</h2>
+        </div>
+        <div class="principle-grid">
+          <div><strong>Selection bias</strong><span>SEER represents covered U.S. registries, so the demo avoids claiming global clinical generalization.</span></div>
+          <div><strong>Information bias</strong><span>Registry-coded unknowns are expected in biomarkers, grade, and size fields; the project treats them explicitly.</span></div>
+          <div><strong>Confounding</strong><span>Race and income may reflect both biology and access to care, so they support prediction and fairness review, not causal claims.</span></div>
+          <div><strong>Temporal shift</strong><span>Diagnosis year patterns and follow-up time affect observed labels, motivating temporal validation and calibration checks.</span></div>
+        </div>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="m1.html">Previous: M1</a>
+        <a class="primary-action" href="m3.html">Next: M3 Preprocessing</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M2</span><span>Demo only</span></footer>
+    <script src="script.js"></script>
+  </body>
+</html>

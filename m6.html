@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M6 Live Demo | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m6">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M6 · Working Demo</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a><a href="m2.html">M2</a><a href="m3.html">M3</a>
+        <a href="m4.html">M4</a><a href="m5.html">M5</a><a class="demo-link active" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M6 · Working Demo / Deployment</p>
+        <h1>Live risk stratification from diagnosis-time features</h1>
+        <p>
+          This page is the interactive deployment artifact. It simulates the BioFusion workflow
+          by taking a patient profile, returning a calibrated risk-style score, and explaining the top drivers.
+        </p>
+      </section>
+      <section class="section-band demo-section">
+        <div class="section-head">
+          <p class="eyebrow">Try preset profiles</p>
+          <h2>Click a scenario to fill the form, then submit it to the backend API</h2>
+        </div>
+        <div class="scenario-grid">
+          <button class="scenario-button" type="button" data-preset="low"><strong>Low-risk profile</strong><span>Early stage, HR+/HER2-, small tumor, no positive nodes.</span></button>
+          <button class="scenario-button" type="button" data-preset="moderate"><strong>Moderate-risk profile</strong><span>Stage II/III boundary, larger tumor, limited nodal involvement.</span></button>
+          <button class="scenario-button" type="button" data-preset="high"><strong>High-risk profile</strong><span>Advanced stage, TNBC, nodal burden, metastatic site.</span></button>
+        </div>
+        <div class="demo-shell">
+          <form id="riskForm" class="form-panel">
+            <div class="field-row">
+              <label for="age">Age at diagnosis <span id="ageValue">64</span></label>
+              <input id="age" name="age" type="range" min="18" max="90" value="64" />
+            </div>
+            <div class="field-grid">
+              <label>Stage group<select id="stage" name="stage"><option value="1A">Stage 1A</option><option value="1B">Stage 1B</option><option value="2A" selected>Stage 2A</option><option value="2B">Stage 2B</option><option value="3A">Stage 3A</option><option value="3B">Stage 3B</option><option value="3C">Stage 3C</option><option value="4">Stage 4</option></select></label>
+              <label>Molecular subtype<select id="subtype" name="subtype"><option value="HR+/HER2-" selected>HR+/HER2-</option><option value="HR+/HER2+">HR+/HER2+</option><option value="HR-/HER2+">HR-/HER2+</option><option value="HR-/HER2-">HR-/HER2- / TNBC</option><option value="Unknown">Unknown</option></select></label>
+              <label>Pathological grade<select id="grade" name="grade"><option value="G1">G1</option><option value="G2" selected>G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="Unknown">Unknown</option></select></label>
+              <label>Race subgroup<select id="race" name="race"><option value="White" selected>White</option><option value="Black">Black</option><option value="Asian or Pacific Islander">Asian / Pacific Islander</option><option value="American Indian/Alaska Native">American Indian / Alaska Native</option><option value="Unknown">Unknown</option></select></label>
+            </div>
+            <div class="field-row">
+              <label for="tumorSize">Tumor size mm <span id="tumorValue">22</span></label>
+              <input id="tumorSize" name="tumorSize" type="range" min="1" max="150" value="22" />
+            </div>
+            <div class="field-grid">
+              <label>Positive lymph nodes<input id="nodesPositive" name="nodesPositive" type="number" min="0" max="40" value="0" /></label>
+              <label>Income context<select id="income" name="income"><option value="120k+" selected>$120k+</option><option value="100-119k">$100k-$119k</option><option value="80-99k">$80k-$99k</option><option value="60-79k">$60k-$79k</option><option value="<60k">&lt;$60k</option><option value="Missing">Missing</option></select></label>
+              <label>Diagnosis period<select id="period" name="period"><option value="pre">2018-2019</option><option value="covid">2020-2021</option><option value="recent" selected>2022-2023</option></select></label>
+            </div>
+            <fieldset class="toggle-set">
+              <legend>Metastatic sites at diagnosis</legend>
+              <label><input type="checkbox" name="mets" value="bone" /> Bone</label>
+              <label><input type="checkbox" name="mets" value="brain" /> Brain</label>
+              <label><input type="checkbox" name="mets" value="liver" /> Liver</label>
+              <label><input type="checkbox" name="mets" value="lung" /> Lung</label>
+            </fieldset>
+            <button class="primary-action full-width" type="submit">
+              <svg aria-hidden="true"><use href="#fa-chart"></use></svg>
+              Calculate Risk Tier
+            </button>
+          </form>
+          <aside class="result-panel" aria-live="polite">
+            <div class="api-status" id="apiStatus">Backend API: checking...</div>
+            <div class="result-top"><span id="riskTier">Moderate risk</span><strong id="riskScore">12.8%</strong></div>
+            <div class="risk-meter" aria-hidden="true"><span id="riskFill"></span></div>
+            <div class="result-detail"><h3>Model-style explanation</h3><ul id="factorList"></ul></div>
+            <div class="recommendation" id="recommendation"></div>
+            <p class="demo-note">
+              This is a course demo estimator based on project findings. It is not a medical device,
+              does not replace clinician judgement, and must not be used for real clinical decisions.
+            </p>
+          </aside>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="detail-grid">
+          <article class="detail-card"><span>1</span><h3>Input</h3><p>The user enters diagnosis-time variables: age, stage, subtype, grade, race, tumor size, nodes, income context, time period, and metastasis sites.</p></article>
+          <article class="detail-card"><span>2</span><h3>Risk score</h3><p>The demo estimator converts the profile into a calibrated risk-style probability and assigns low, moderate, or high risk.</p></article>
+          <article class="detail-card"><span>3</span><h3>Explanation</h3><p>The output lists top feature drivers, mirroring the stakeholder-facing explainability goal of the full project.</p></article>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Deployment architecture</p>
+          <h2>The page calls a backend API instead of calculating locally</h2>
+        </div>
+        <div class="flow-board six">
+          <div class="flow-step"><strong>Frontend</strong><span>GitHub Pages hosts the static M1-M6 website.</span></div>
+          <div class="flow-step"><strong>Form input</strong><span>The M6 page collects diagnosis-time features from the user.</span></div>
+          <div class="flow-step"><strong>API call</strong><span>The browser sends JSON to `/api/predict` on the backend service.</span></div>
+          <div class="flow-step"><strong>Model layer</strong><span>The backend computes risk and feature drivers.</span></div>
+          <div class="flow-step"><strong>JSON response</strong><span>The API returns risk, tier, recommendation, and top factors.</span></div>
+          <div class="flow-step"><strong>Display</strong><span>The page updates the risk meter, explanation, and status badge.</span></div>
+        </div>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="m5.html">Previous: M5</a>
+        <a class="primary-action" href="index.html">Back to Home</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M6</span><span>Demo only</span></footer>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M5 Modelling | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m5">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M5 · Modelling</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a><a href="m2.html">M2</a><a href="m3.html">M3</a>
+        <a href="m4.html">M4</a><a class="active" href="m5.html">M5</a><a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M5 · Modelling and Evaluation</p>
+        <h1>Compare baselines, tabular models, and BioFusion under temporal validation</h1>
+        <p>
+          M5 evaluates multiple models on the same diagnosis-time feature policy and temporal split,
+          then uses BioFusion as the final demonstration model.
+        </p>
+      </section>
+      <section class="section-band model-layout">
+        <figure class="figure-panel compact">
+          <img src="assets/final_comparison.png" alt="Final model comparison" />
+          <figcaption>BioFusion ranks first in the final 22-feature comparison.</figcaption>
+        </figure>
+        <div class="model-table-wrap">
+          <table class="model-table">
+            <thead><tr><th>Model</th><th>PR-AUC</th><th>AUROC</th><th>F1</th><th>Brier</th></tr></thead>
+            <tbody>
+              <tr class="best-row"><td>BioFusion</td><td>0.4029</td><td>0.9360</td><td>0.4429</td><td>0.0340</td></tr>
+              <tr><td>XGB_22</td><td>0.3985</td><td>0.9341</td><td>0.1693</td><td>0.1939</td></tr>
+              <tr><td>CalibratedRF_22</td><td>0.3972</td><td>0.9304</td><td>0.4224</td><td>0.0323</td></tr>
+              <tr><td>RF_22</td><td>0.3966</td><td>0.9304</td><td>0.2014</td><td>0.1533</td></tr>
+            </tbody>
+          </table>
+          <div class="architecture">
+            <div>Random Forest</div><div>CatBoost</div><div>XGBoost</div>
+            <span>Out-of-fold stacking</span>
+            <strong>BioFusion calibrated score</strong>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <figure class="figure-panel wide">
+          <img src="assets/clinical_impact.png" alt="Clinical impact comparison" />
+          <figcaption>Stakeholder view: compare deaths identified, deaths missed, and false alerts at threshold 0.5.</figcaption>
+        </figure>
+      </section>
+      <section class="section-band">
+        <div class="gallery-shell" data-gallery>
+          <div class="gallery-buttons">
+            <button class="active" type="button" data-gallery-target data-src="assets/final_comparison.png" data-alt="Final comparison" data-caption="Final model ranking shows the performance effect of the extended 22-feature set and BioFusion design.">Final ranking</button>
+            <button type="button" data-gallery-target data-src="assets/biofusion_ablation.png" data-alt="BioFusion ablation" data-caption="Ablation compares base learner combinations and shows how CatBoost, XGBoost, and Random Forest contribute differently.">Ablation</button>
+            <button type="button" data-gallery-target data-src="assets/clinical_impact.png" data-alt="Clinical impact" data-caption="Stakeholder view translates model metrics into deaths identified, deaths missed, and false alerts.">Clinical impact</button>
+          </div>
+          <figure class="figure-panel">
+            <img data-gallery-image src="assets/final_comparison.png" alt="Final comparison" />
+            <figcaption data-gallery-caption>Final model ranking shows the performance effect of the extended 22-feature set and BioFusion design.</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Modelling workflow</p>
+          <h2>How the final model was selected</h2>
+        </div>
+        <div class="tab-shell" data-tab-group>
+          <div class="tab-buttons">
+            <button class="active" data-tab="baseline" type="button">Baselines</button>
+            <button data-tab="features" type="button">Feature expansion</button>
+            <button data-tab="fusion" type="button">BioFusion</button>
+            <button data-tab="validation" type="button">Validation</button>
+          </div>
+          <div class="tab-panel active" data-tab-panel="baseline">
+            <h3>Baseline models</h3>
+            <p>Logistic Regression provides interpretability. Random Forest and XGBoost test non-linear tabular performance. Additional models include ExtraTrees, HistGBM, MLP, TabNet, FT-Transformer, SAINT, and stacking.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="features">
+            <h3>From 13 features to 22 features</h3>
+            <p>The final feature set adds T/N/M recodes, lymph node counts, node ratio, metastatic sites, pathological grade, histology group, marital status, metro context, income order, age, and COVID-period indicator.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="fusion">
+            <h3>BioFusion design</h3>
+            <p>BioFusion combines Random Forest, CatBoost, and XGBoost base learners through out-of-fold stacking, then applies an XGBoost meta-learner and isotonic calibration.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="validation">
+            <h3>Validation and limitations</h3>
+            <p>The primary holdout is temporal: training on 2018-2021 and testing on 2022-2023. The model reports PR-AUC, AUROC, F1, precision, recall, and Brier Score, while acknowledging follow-up truncation and external validity limitations.</p>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="detail-grid">
+          <article class="detail-card"><span>1</span><h3>Primary metric</h3><p>PR-AUC is emphasized because the positive class is rare and precision-recall tradeoffs matter more than raw accuracy.</p></article>
+          <article class="detail-card"><span>2</span><h3>Calibration</h3><p>Isotonic calibration improves probability reliability, which matters for risk-tier communication.</p></article>
+          <article class="detail-card"><span>3</span><h3>Interpretability</h3><p>Feature importance is checked against clinical knowledge: stage, grade, T/N/M, node burden, tumor size, and subtype should dominate.</p></article>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Failure modes</p>
+          <h2>What the model can and cannot claim</h2>
+        </div>
+        <table class="mini-table">
+          <thead><tr><th>Limitation</th><th>Why it matters</th><th>How the demo handles it</th></tr></thead>
+          <tbody>
+            <tr><td>Follow-up truncation</td><td>Recent diagnoses have less time for deaths to be observed.</td><td>M6 labels the score as a risk-style demo output, not a clinical endpoint guarantee.</td></tr>
+            <tr><td>Class imbalance</td><td>False alerts and missed cases must be interpreted together.</td><td>The stakeholder chart explains captured deaths and false alerts, not just AUROC.</td></tr>
+            <tr><td>External validity</td><td>SEER-based performance may not transfer unchanged to other healthcare systems.</td><td>The demo avoids making deployment claims beyond the project setting.</td></tr>
+            <tr><td>Interpretability tradeoff</td><td>Stacking improves performance but is less transparent than a single logistic model.</td><td>The API returns top drivers to keep the output explainable for presentation.</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="m4.html">Previous: M4</a>
+        <a class="primary-action" href="m6.html">Next: M6 Deployment</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M5</span><span>Demo only</span></footer>
+    <script src="script.js"></script>
+  </body>
+</html>

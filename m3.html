@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M3 Preprocessing | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m3">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M3 · Preprocessing</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a><a href="m2.html">M2</a><a class="active" href="m3.html">M3</a>
+        <a href="m4.html">M4</a><a href="m5.html">M5</a><a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M3 · Data Preprocessing</p>
+        <h1>Turn raw registry records into analysis-ready patient rows</h1>
+        <p>
+          The preprocessing pipeline keeps the earliest breast cancer record per patient,
+          constructs the target, parses coded fields, flags missingness, and creates the temporal split.
+        </p>
+      </section>
+      <section class="section-band two-col">
+        <div class="section-copy">
+          <h2>15-step reproducible pipeline</h2>
+          <div class="process-list">
+            <div><span>01</span>Verify raw file integrity with SHA-256 checksums.</div>
+            <div><span>05</span>Deduplicate to the earliest diagnosis per patient to prevent leakage.</div>
+            <div><span>06</span>Map SEER cause-specific death classification into a binary target.</div>
+            <div><span>12</span>Create temporal split: 2018-2021 training, 2022-2023 testing.</div>
+            <div><span>14</span>Retain outliers with explicit flags instead of deleting rare clinical cases.</div>
+          </div>
+        </div>
+        <div class="hero-dashboard">
+          <div class="metric-strip">
+            <div><span>409,276</span><small>analysis-ready rows</small></div>
+            <div><span>79</span><small>final columns</small></div>
+            <div><span>13,494</span><small>duplicate patient records removed</small></div>
+            <div><span>750</span><small>unknown cause-of-death rows excluded</small></div>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <h2>Data quality principles</h2>
+          <p>
+            Missing values are not silently imputed away. SEER-specific codes such as
+            Blank(s), Unknown, and special tumour-size codes are standardized and represented
+            with explicit indicators for downstream modelling.
+          </p>
+        </div>
+        <div class="principle-grid">
+          <div><strong>No silent deletion</strong><span>Rare ages and large tumor sizes are flagged for review instead of being removed automatically.</span></div>
+          <div><strong>No leakage by accident</strong><span>Survival time and vital status are kept for audit but excluded from prediction features.</span></div>
+          <div><strong>Missingness is signal</strong><span>Clinical unknowns are represented as explicit categories or flags.</span></div>
+          <div><strong>Temporal realism</strong><span>The split follows diagnosis time so the evaluation resembles future deployment.</span></div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Preprocessing log</p>
+          <h2>Open each transformation to explain the cleaning decisions</h2>
+        </div>
+        <div class="accordion">
+          <div class="accordion-item open">
+            <button class="accordion-button" type="button">T-01 · Select clinically relevant variables</button>
+            <div class="accordion-panel">The full registry export is reduced to variables that support the diagnosis-time prediction task: demographics, tumor characteristics, staging, biomarkers, lymph node status, metastasis indicators, and outcome audit fields.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-02 · Verify raw data integrity</button>
+            <div class="accordion-panel">The pipeline records a checksum and basic dataset profile so future runs can detect accidental changes before any analysis begins.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-03 · Standardize column names</button>
+            <div class="accordion-panel">Long SEER labels with spaces, punctuation, and parentheses are converted to consistent snake_case names for safer modelling code.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-04 · Create stable identifiers</button>
+            <div class="accordion-panel">A stable row identifier is created while retaining the original patient identifier for deduplication and audit checks.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-05 · Deduplicate at patient level</button>
+            <div class="accordion-panel">For patients with multiple breast cancer records, the earliest diagnosis is retained to avoid patient-level leakage between training and evaluation periods.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-06 · Construct the binary target</button>
+            <div class="accordion-panel">SEER cause-specific death classification is mapped to `cancer_specific_death`, where 1 means death attributable to breast cancer and 0 means alive or death from another cause.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-07 · Remove ambiguous labels</button>
+            <div class="accordion-panel">Rows with missing or unknown cause of death are excluded from target modelling because assigning them to either class would introduce label noise.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-08 · Parse age</button>
+            <div class="accordion-panel">Age recodes are converted into numeric age while preserving the top-coded 90+ indicator as a separate flag.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-09 · Parse tumor size</button>
+            <div class="accordion-panel">True tumor-size measurements are converted to millimeters, while administrative special codes are treated as missing-like values with explicit flags.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-10 · Convert income brackets</button>
+            <div class="accordion-panel">Income categories are converted into approximate numeric midpoints while preserving missing and top-coded information.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-11 · Standardize missing codes</button>
+            <div class="accordion-panel">Different SEER missingness labels are standardized so modelling and visualization code can handle them consistently.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-12 · Create temporal variables</button>
+            <div class="accordion-panel">The dataset is labelled for temporal validation and for COVID-era sensitivity analysis, supporting a realistic deployment-style evaluation.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-13 · Add missingness indicators</button>
+            <div class="accordion-panel">Flags are created for clinically important fields such as tumor size, grade, stage, ER, PR, HER2, and subtype because missingness can itself carry signal.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-14 · Flag outlier-like records</button>
+            <div class="accordion-panel">Rare ages and large tumor sizes are flagged for sensitivity analysis rather than removed, because they may represent real clinical presentations.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-button" type="button">T-15 · Export analysis-ready outputs</button>
+            <div class="accordion-panel">The final dataset, schema, exclusion summary, and data-quality report are produced so downstream EDA and modelling are reproducible.</div>
+          </div>
+        </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Analysis-ready output</p>
+          <h2>What the cleaned dataset enables</h2>
+        </div>
+        <div class="detail-grid">
+          <article class="detail-card"><span>A</span><h3>EDA</h3><p>Stage, subtype, age, tumor size, missingness, and subgroup patterns can be visualized consistently.</p></article>
+          <article class="detail-card"><span>B</span><h3>Modelling</h3><p>Models can use a shared feature policy and a consistent temporal split for fair comparison.</p></article>
+          <article class="detail-card"><span>C</span><h3>Deployment</h3><p>The M6 form mirrors the cleaned feature schema: stage, subtype, age, tumor size, nodes, metastasis, and context.</p></article>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Transformation roles</p>
+          <h2>Every preprocessing decision has a modelling purpose</h2>
+        </div>
+        <table class="mini-table">
+          <thead><tr><th>Transformation</th><th>Purpose</th><th>Demo connection</th></tr></thead>
+          <tbody>
+            <tr><td>Target mapping</td><td>Convert SEER cause-specific death classification into a binary prediction label.</td><td>The M6 API returns a probability for this same label.</td></tr>
+            <tr><td>Age parsing</td><td>Convert text-coded age into usable numeric age while preserving top-coded older age information.</td><td>The M6 age slider mirrors this cleaned feature.</td></tr>
+            <tr><td>Tumor size parsing</td><td>Separate real millimeter values from administrative special codes.</td><td>The M6 tumor-size slider reflects clinically interpretable units.</td></tr>
+            <tr><td>Missingness flags</td><td>Represent unknown clinical values as signal instead of hiding them.</td><td>The model explanation can treat unknowns as meaningful context.</td></tr>
+            <tr><td>Leakage review</td><td>Keep outcome fields out of predictor candidates.</td><td>The demo only asks for diagnosis-time profile inputs.</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="m2.html">Previous: M2</a>
+        <a class="primary-action" href="m4.html">Next: M4 EDA</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M3</span><span>Demo only</span></footer>
+    <script src="script.js"></script>
+  </body>
+</html>

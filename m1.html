@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M1 Research Question | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m1">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M1 · Research Question</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a class="active" href="m1.html">M1</a><a href="m2.html">M2</a><a href="m3.html">M3</a>
+        <a href="m4.html">M4</a><a href="m5.html">M5</a><a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M1 · Problem Definition</p>
+        <h1>Define a clinically meaningful prediction task</h1>
+        <p>
+          The project starts with one focused question: can diagnosis-time clinical and
+          demographic variables predict breast cancer-specific mortality in SEER patients?
+        </p>
+      </section>
+      <section class="section-band two-col">
+        <div class="section-copy">
+          <h2>Why this problem matters</h2>
+          <p>
+            Early risk stratification helps clinicians prioritize follow-up, treatment discussion,
+            and resource allocation. The target is not all-cause death; it is cancer-specific death,
+            which is more aligned with breast cancer prognosis.
+          </p>
+          <ul class="check-list">
+            <li>Research type: predictive research, not causal inference.</li>
+            <li>Target: `cancer_specific_death`, binary 0/1.</li>
+            <li>Feature policy: use variables available at or near diagnosis.</li>
+            <li>Clinical priority: reduce missed high-risk patients while controlling false alerts.</li>
+          </ul>
+        </div>
+        <figure class="figure-panel">
+          <img src="assets/overview.png" alt="Project overview diagram" />
+          <figcaption>The M1 framing connects clinical motivation, SEER data, modelling, and deployment.</figcaption>
+        </figure>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Proposal logic</p>
+          <h2>From clinical pain point to measurable research question</h2>
+        </div>
+        <div class="detail-grid">
+          <article class="detail-card">
+            <span>1</span>
+            <h3>Single pain point</h3>
+            <p>Which newly diagnosed breast cancer patients are at high risk of cancer-specific death based on information available at diagnosis?</p>
+          </article>
+          <article class="detail-card">
+            <span>2</span>
+            <h3>Strict prediction scope</h3>
+            <p>The task is intentionally binary and focused. The project avoids expanding into general survival analysis, multi-label prediction, or causal treatment recommendation.</p>
+          </article>
+          <article class="detail-card">
+            <span>3</span>
+            <h3>Deployment target</h3>
+            <p>The final output must be understandable to clinical stakeholders: calibrated risk, risk tier, and feature-driven explanation.</p>
+          </article>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="tab-shell" data-tab-group>
+          <div class="tab-buttons">
+            <button class="active" data-tab="question" type="button">Scientific Question</button>
+            <button data-tab="hypothesis" type="button">Hypotheses</button>
+            <button data-tab="metrics" type="button">Evaluation Metrics</button>
+            <button data-tab="ethics" type="button">Ethics</button>
+          </div>
+          <div class="tab-panel active" data-tab-panel="question">
+            <h3>Primary scientific question</h3>
+            <p>Can a machine learning model trained on SEER clinical and demographic features available at diagnosis, with strict temporal validation and interpretability, accurately predict breast cancer-specific mortality?</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="hypothesis">
+            <h3>Core hypothesis</h3>
+            <p>Advanced stage, triple-negative subtype, and nodal involvement are expected to be the strongest mortality predictors. Demographic variables such as race and income may add signal because they proxy access, screening, and structural inequities.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="metrics">
+            <h3>Metric design</h3>
+            <p>Because the positive class is rare, the project prioritizes PR-AUC, minority-class F1, sensitivity at high specificity, and Brier Score. Accuracy is not suitable as the primary metric.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="ethics">
+            <h3>Ethical guardrails</h3>
+            <p>SEER data is de-identified. The model is framed as decision support only. Fairness auditing across race, age, and income groups is treated as a required part of the research lifecycle.</p>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Research design checklist</p>
+          <h2>What M1 establishes before any modelling begins</h2>
+        </div>
+        <table class="mini-table">
+          <thead>
+            <tr><th>Design element</th><th>Decision</th><th>Why it matters</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Observation unit</td><td>One patient-level breast cancer diagnosis profile.</td><td>Prevents the model from mixing repeated records from the same patient across evaluation periods.</td></tr>
+            <tr><td>Prediction moment</td><td>Diagnosis-time risk assessment.</td><td>Makes the output actionable before long-term outcomes are known.</td></tr>
+            <tr><td>Outcome definition</td><td>Cancer-specific death rather than all-cause death.</td><td>Focuses the task on breast cancer prognosis instead of unrelated competing mortality.</td></tr>
+            <tr><td>Generalization test</td><td>Train on older diagnosis years and evaluate on later diagnosis years.</td><td>Simulates future deployment more honestly than random splitting.</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="section-band">
+        <div class="principle-grid">
+          <div><strong>Commercial value</strong><span>The demo can be framed as a risk-scoring module for oncology analytics or decision-support workflows.</span></div>
+          <div><strong>Clinical value</strong><span>The output supports prioritizing review for patients likely to need closer follow-up.</span></div>
+          <div><strong>Interpretability value</strong><span>Risk tiers are paired with feature drivers rather than a black-box number alone.</span></div>
+          <div><strong>Fairness value</strong><span>Race, age, and income are explicitly considered as subgroup evaluation axes.</span></div>
+        </div>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="index.html">Back to Home</a>
+        <a class="primary-action" href="m2.html">Next: M2 Data Acquisition</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M1</span><span>Demo only</span></footer>
+    <script src="script.js"></script>
+  </body>
+</html>

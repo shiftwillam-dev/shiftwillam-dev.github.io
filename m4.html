@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>M4 EDA | Group 17 Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="m4">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">17</span>
+        <span><strong>Breast Cancer Survival Prediction</strong><small>M4 · Exploratory Data Analysis</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a><a href="m2.html">M2</a><a href="m3.html">M3</a>
+        <a class="active" href="m4.html">M4</a><a href="m5.html">M5</a><a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+    <main>
+      <section class="page-hero section-band">
+        <p class="milestone-label">M4 · Exploratory Data Analysis</p>
+        <h1>Use EDA to make modelling decisions, not just charts</h1>
+        <p>
+          EDA confirms severe class imbalance, strong stage-driven mortality gradients,
+          stage-subtype interaction, non-linear age effects, and temporal follow-up truncation.
+        </p>
+      </section>
+      <section class="section-band">
+        <div class="evidence-grid">
+          <figure class="figure-panel compact">
+            <img src="assets/class_imbalance.png" alt="Class imbalance chart" />
+            <figcaption>Only 6.5% of records are positive, making PR-AUC and minority-class F1 essential.</figcaption>
+          </figure>
+          <figure class="figure-panel compact">
+            <img src="assets/stage_subtype_heatmap.png" alt="Stage by subtype mortality heatmap" />
+            <figcaption>Stage and subtype interact; late-stage TNBC patients carry the highest risk.</figcaption>
+          </figure>
+        </div>
+        <div class="insight-row">
+          <div><strong>Stage</strong><span>Strongest monotonic clinical signal.</span></div>
+          <div><strong>Subtype</strong><span>Molecular biology changes risk within stage.</span></div>
+          <div><strong>Age</strong><span>Non-linear, with elevated risk in elderly advanced-stage cases.</span></div>
+          <div><strong>Time</strong><span>Recent-year labels are affected by shorter follow-up.</span></div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">Interactive evidence gallery</p>
+          <h2>Switch between the EDA figures used to revise hypotheses</h2>
+        </div>
+        <div class="gallery-shell" data-gallery>
+          <div class="gallery-buttons">
+            <button class="active" type="button" data-gallery-target data-src="assets/class_imbalance.png" data-alt="Class imbalance chart" data-caption="Class imbalance makes accuracy misleading and motivates PR-AUC, F1, and threshold tuning.">Class imbalance</button>
+            <button type="button" data-gallery-target data-src="assets/stage_subtype_heatmap.png" data-alt="Stage subtype heatmap" data-caption="Stage and molecular subtype interact, especially in advanced disease.">Stage x subtype</button>
+            <button type="button" data-gallery-target data-src="assets/age_stage_heatmap.png" data-alt="Age stage heatmap" data-caption="Age is not a simple linear feature; advanced-stage risk differs across age groups.">Age x stage</button>
+            <button type="button" data-gallery-target data-src="assets/missingness.png" data-alt="Missingness chart" data-caption="Missingness patterns require explicit indicators and careful encoding rather than naive imputation.">Missingness</button>
+          </div>
+          <figure class="figure-panel">
+            <img data-gallery-image src="assets/class_imbalance.png" alt="Class imbalance chart" />
+            <figcaption data-gallery-caption>Class imbalance makes accuracy misleading and motivates PR-AUC, F1, and threshold tuning.</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="detail-grid">
+          <article class="detail-card"><span>H1</span><h3>Confirmed</h3><p>Stage is the strongest single clinical risk signal and should dominate SHAP importance.</p></article>
+          <article class="detail-card"><span>H2</span><h3>Refined</h3><p>Subtype matters most through interaction with stage, not as a simple additive effect.</p></article>
+          <article class="detail-card"><span>H3</span><h3>New</h3><p>Temporal follow-up truncation means calibration must be interpreted carefully on recent cases.</p></article>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="tab-shell" data-tab-group>
+          <div class="tab-buttons">
+            <button class="active" data-tab="univariate" type="button">Univariate</button>
+            <button data-tab="bivariate" type="button">Bivariate</button>
+            <button data-tab="multivariate" type="button">Multivariate</button>
+            <button data-tab="model-ready" type="button">Model-ready decisions</button>
+          </div>
+          <div class="tab-panel active" data-tab-panel="univariate">
+            <h3>Univariate findings</h3>
+            <p>The target is severely imbalanced. Age peaks around older adult groups, and diagnosis year patterns reveal that recent records have shorter observed follow-up.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="bivariate">
+            <h3>Bivariate findings</h3>
+            <p>Stage, subtype, tumor size, and race show visible mortality differences. These patterns motivate including both clinical severity and demographic context.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="multivariate">
+            <h3>Multivariate findings</h3>
+            <p>Stage-subtype and age-stage heatmaps reveal interactions that simple main-effect models may miss.</p>
+          </div>
+          <div class="tab-panel" data-tab-panel="model-ready">
+            <h3>EDA-driven modelling decisions</h3>
+            <p>Use temporal validation, PR-AUC, class-weighting or threshold adjustment, tree-based models for interactions, and calibration checks for probability outputs.</p>
+          </div>
+        </div>
+      </section>
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">EDA to modelling handoff</p>
+          <h2>The charts directly determine model design</h2>
+        </div>
+        <table class="mini-table">
+          <thead><tr><th>EDA finding</th><th>Implication</th><th>Implemented in M5/M6</th></tr></thead>
+          <tbody>
+            <tr><td>Severe class imbalance</td><td>Accuracy is not enough; use PR-AUC, F1, recall, and threshold-aware interpretation.</td><td>M5 ranks models by PR-AUC; M6 reports risk tier instead of a hard yes/no claim.</td></tr>
+            <tr><td>Stage dominates risk</td><td>Stage should be a central predictor and a clinical plausibility check.</td><td>M6 requires stage and shows stage as a top driver when relevant.</td></tr>
+            <tr><td>Stage and subtype interact</td><td>Prefer models that capture non-linear interactions.</td><td>BioFusion combines tree-based learners that handle interactions naturally.</td></tr>
+            <tr><td>Age effect is non-linear</td><td>A single linear age slope may miss young and elderly risk patterns.</td><td>M6 treats age groups differently inside the backend model logic.</td></tr>
+            <tr><td>Missingness is structured</td><td>Unknown values should remain visible rather than being silently overwritten.</td><td>The demo supports unknown categories for subtype, grade, and race.</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="section-band nav-pager">
+        <a class="secondary-action" href="m3.html">Previous: M3</a>
+        <a class="primary-action" href="m5.html">Next: M5 Modelling</a>
+      </section>
+    </main>
+    <footer class="site-footer"><span>Group 17 · M4</span><span>Demo only</span></footer>
+    <script src="script.js"></script>
+  </body>
+</html>

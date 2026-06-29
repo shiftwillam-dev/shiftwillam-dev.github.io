@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Group 17 M6 Demo | Breast Cancer Survival Prediction</title>
+    <meta
+      name="description"
+      content="INFO442 Group 17 multi-page working demo for SEER breast cancer-specific mortality prediction."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="home">
+    <div id="decor"></div>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Home">
+        <span class="brand-mark">17</span>
+        <span>
+          <strong>Breast Cancer Survival Prediction</strong>
+          <small>LZU INFO442 · M6 Working Demo</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="Milestone navigation">
+        <a href="m1.html">M1</a>
+        <a href="m2.html">M2</a>
+        <a href="m3.html">M3</a>
+        <a href="m4.html">M4</a>
+        <a href="m5.html">M5</a>
+        <a class="demo-link" href="m6.html">M6 Demo</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero section-band">
+        <div class="hero-copy">
+          <p class="eyebrow">Working demo · multi-page deployment</p>
+          <h1>From SEER registry data to an interactive breast cancer risk demo</h1>
+          <p class="hero-lede">
+            This website is the M6 deliverable: a runnable, presentation-ready deployment
+            that turns the full M1-M6 data science cycle into a clear navigation path.
+            Each milestone is a separate page, ending with the real-time M6 prediction demo.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="m6.html">
+              <svg aria-hidden="true"><use href="#fa-bolt"></use></svg>
+              Open Live Demo
+            </a>
+            <a class="secondary-action" href="m1.html">Start at M1</a>
+          </div>
+        </div>
+        <div class="hero-dashboard" aria-label="Project performance summary">
+          <div class="metric-strip">
+            <div>
+              <span>409,276</span>
+              <small>analysis-ready patients</small>
+            </div>
+            <div>
+              <span>79</span>
+              <small>cleaned variables</small>
+            </div>
+            <div>
+              <span>0.4029</span>
+              <small>BioFusion PR-AUC</small>
+            </div>
+            <div>
+              <span>0.9360</span>
+              <small>BioFusion AUROC</small>
+            </div>
+          </div>
+          <div class="live-preview">
+            <div class="preview-head">
+              <span>Demo destination</span>
+              <strong>M6</strong>
+            </div>
+            <div class="risk-track" aria-hidden="true">
+              <span style="width: 86%"></span>
+            </div>
+            <p>Navigate through the research cycle, then demonstrate live risk stratification.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band">
+        <div class="section-head">
+          <p class="eyebrow">15-minute presentation route</p>
+          <h2>One page per milestone, one coherent research story</h2>
+        </div>
+        <div class="timeline">
+          <a href="m1.html"><span>M1</span><strong>Research Question</strong><small>Define the clinical prediction problem</small></a>
+          <a href="m2.html"><span>M2</span><strong>Data Acquisition</strong><small>Explain SEER data provenance</small></a>
+          <a href="m3.html"><span>M3</span><strong>Preprocessing</strong><small>Show the reproducible cleaning pipeline</small></a>
+          <a href="m4.html"><span>M4</span><strong>EDA</strong><small>Use evidence to refine hypotheses</small></a>
+          <a href="m5.html"><span>M5</span><strong>Modelling</strong><small>Compare models and justify BioFusion</small></a>
+          <a href="m6.html"><span>M6</span><strong>Deployment</strong><small>Run the live prediction demo</small></a>
+        </div>
+      </section>
+
+      <section class="section-band closing">
+        <div>
+          <p class="milestone-label">What this website proves</p>
+          <h2>A deliverable, a demo tool, and evidence of a closed data science loop</h2>
+        </div>
+        <div class="closing-grid">
+          <div><strong>Working demo</strong><span>The site can run locally or be deployed as a public static URL.</span></div>
+          <div><strong>Presentation spine</strong><span>The M1-M6 route gives the 15-minute presentation a clean structure.</span></div>
+          <div><strong>Research closure</strong><span>Problem, data, preprocessing, EDA, modelling, and deployment are connected.</span></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Group 17 · LZU INFO442 · SEER Breast Cancer Survival Prediction</span>
+      <span>Font Awesome-inspired inline SVG icons · Demo only</span>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
