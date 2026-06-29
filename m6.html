@@ -34,7 +34,7 @@
         </div>
         <div class="scenario-grid">
           <button class="scenario-button" type="button" data-preset="low"><strong>Low-risk profile</strong><span>Early stage, HR+/HER2-, small tumor, no positive nodes.</span></button>
-          <button class="scenario-button" type="button" data-preset="moderate"><strong>Moderate-risk profile</strong><span>Stage II/III boundary, larger tumor, limited nodal involvement.</span></button>
+          <button class="scenario-button" type="button" data-preset="moderate"><strong>Moderate-risk profile</strong><span>Stage 2A, grade 2, moderate tumor size, no distant metastasis.</span></button>
           <button class="scenario-button" type="button" data-preset="high"><strong>High-risk profile</strong><span>Advanced stage, TNBC, nodal burden, metastatic site.</span></button>
         </div>
         <div class="demo-shell">
@@ -56,7 +56,6 @@
             <div class="field-grid">
               <label>Positive lymph nodes<input id="nodesPositive" name="nodesPositive" type="number" min="0" max="40" value="0" /></label>
               <label>Income context<select id="income" name="income"><option value="120k+" selected>$120k+</option><option value="100-119k">$100k-$119k</option><option value="80-99k">$80k-$99k</option><option value="60-79k">$60k-$79k</option><option value="<60k">&lt;$60k</option><option value="Missing">Missing</option></select></label>
-              <label>Diagnosis period<select id="period" name="period"><option value="pre">2018-2019</option><option value="covid">2020-2021</option><option value="recent" selected>2022-2023</option></select></label>
             </div>
             <fieldset class="toggle-set">
               <legend>Metastatic sites at diagnosis</legend>
@@ -85,7 +84,7 @@
       </section>
       <section class="section-band">
         <div class="detail-grid">
-          <article class="detail-card"><span>1</span><h3>Input</h3><p>The user enters diagnosis-time variables: age, stage, subtype, grade, race, tumor size, nodes, income context, time period, and metastasis sites.</p></article>
+          <article class="detail-card"><span>1</span><h3>Input</h3><p>The user enters diagnosis-time variables: age, stage, subtype, grade, race, tumor size, nodes, income context, and metastasis sites.</p></article>
           <article class="detail-card"><span>2</span><h3>Risk score</h3><p>The BioFusion API returns a probability and assigns low, medium, or high risk using documented thresholds.</p></article>
           <article class="detail-card"><span>3</span><h3>Request summary</h3><p>The result panel lists the mapped API fields sent to the backend so the request can be inspected.</p></article>
         </div>

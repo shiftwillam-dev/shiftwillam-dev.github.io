@@ -98,20 +98,18 @@ function initPredictor(riskForm) {
       grade: "G1",
       race: "White",
       income: "120k+",
-      period: "recent",
       nodesPositive: 0,
       mets: [],
     },
     moderate: {
-      age: 71,
-      tumorSize: 38,
-      stage: "2B",
-      subtype: "HR+/HER2+",
-      grade: "G3",
-      race: "Black",
-      income: "60-79k",
-      period: "covid",
-      nodesPositive: 2,
+      age: 64,
+      tumorSize: 22,
+      stage: "2A",
+      subtype: "HR+/HER2-",
+      grade: "G2",
+      race: "White",
+      income: "120k+",
+      nodesPositive: 0,
       mets: [],
     },
     high: {
@@ -122,7 +120,6 @@ function initPredictor(riskForm) {
       grade: "G3",
       race: "Black",
       income: "<60k",
-      period: "pre",
       nodesPositive: 8,
       mets: ["liver"],
     },
@@ -160,7 +157,6 @@ function initPredictor(riskForm) {
       grade: data.get("grade"),
       race: data.get("race"),
       income: data.get("income"),
-      period: data.get("period"),
       nodesPositive: Number(data.get("nodesPositive") || 0),
       mets: data.getAll("mets"),
     };
@@ -214,7 +210,6 @@ function initPredictor(riskForm) {
       lung_mets: mets.has("lung") ? 1 : 0,
       metro: 0,
       income_ord: incomeOrder[data.income] ?? 0,
-      covid_period: data.period === "covid" ? 1 : 0,
     };
   }
 
@@ -239,7 +234,6 @@ function initPredictor(riskForm) {
     setField("grade", preset.grade);
     setField("race", preset.race);
     setField("income", preset.income);
-    setField("period", preset.period);
     setField("nodesPositive", preset.nodesPositive);
     riskForm.querySelectorAll('input[name="mets"]').forEach((box) => {
       box.checked = preset.mets.includes(box.value);

@@ -59,8 +59,7 @@ Example payload generated from the M6 form:
   "liver_mets": 0,
   "lung_mets": 0,
   "metro": 0,
-  "income_ord": 5,
-  "covid_period": 0
+  "income_ord": 5
 }
 ```
 
@@ -117,7 +116,6 @@ The M6 page keeps the user-facing form compact, then maps it into BioFusion fiel
 | `grade` | `grade_path` |
 | `race` | `race` |
 | `income` | `income_ord` |
-| `period` | `covid_period` |
 | `nodesPositive` | `nodes_positive` and derived `n_recode` |
 | `mets` | `bone_mets`, `brain_mets`, `liver_mets`, `lung_mets` |
 
